@@ -1,0 +1,57 @@
+{
+  "project": "Kadak Chai Co. (#MyChaiBreak)",
+  "tools": {
+    "S1": "Claude (Web) — Architecture planning, pair-programming guidance, initial skeletons",
+    "S2": "Antigravity (IDE Agent) — Test scaffolding, Jinja2/CSS templates, route implementation",
+    "S3": "Gemini (Web) — Live Groq debugging, orchestrator & test suite authoring, Phase 3 TDD workflow"
+  },
+  "sessions": [
+    {
+      "id": "S1-01",
+      "tool": "S1",
+      "phase": "Phase 1 — Foundation",
+      "scope": [
+        "pyproject/requirements setup, strict .gitignore, .env.example",
+        "app/config.py (loud startup failure on missing secrets)",
+        "app/db.py, app/models.py (public_id vs internal id, ai_decision vs status)",
+        "app/main.py (/health endpoint)"
+      ],
+      "human_decisions": [
+        "Enforced separation between sequential internal id and random URL-safe public_id.",
+        "Kept ai_decision separate from publication status to support manual admin overrides."
+      ]
+    },
+    {
+      "id": "S1-S2-S3-02",
+      "tool": "S1, S2, S3",
+      "phase": "Phase 2 — AI Moderation Module",
+      "scope": [
+        "app/ai/parse.py & app/ai/mock.py (Pydantic v2 AIResult schema, deterministic mock triggers)",
+        "app/ai/client.py (OpenAI-compatible httpx client for Groq)",
+        "app/ai/__init__.py (analyze_story orchestrator with pending_review fallback)",
+        "tests/test_parse.py & tests/test_ai.py (42 unit tests)"
+      ],
+      "human_decisions": [
+        "Discovered Groq 404s on deprecated Llama IDs; queried /models and switched AI_MODEL to openai/gpt-oss-20b.",
+        "Removed response_format: json_object after hitting http_400 on Groq, relying on SYSTEM_PROMPT + parse_ai_response.",
+        "Diagnosed JSON truncation caused by openai/gpt-oss-20b internal reasoning tokens (~166 tokens) and raised max_tokens from 200 to 500.",
+        "Enforced short error codes with `raise ... from None` so API keys, response bodies, and user stories never leak into logs or tracebacks."
+      ]
+    },
+    {
+      "id": "S2-S3-03",
+      "tool": "S2, S3",
+      "phase": "Phase 3 — Validation & Public Submission Flow",
+      "scope": [
+        "tests/test_validation.py (69 unit tests generated first as a TDD spec)",
+        "app/main.py (GET /, POST /submit with 303 PRG, GET /result/{public_id})",
+        "app/templates/{base,index,result}.html & app/static/style.css",
+        "tests/test_public_routes.py (7 end-to-end route & XSS tests)"
+      ],
+      "human_decisions": [
+        "Hand-wrote the entire core validation and contact normalisation logic in app/validation.py against the 69-test TDD suite.",
+        "Verified live end-to-end submission flow in browser and Swagger /docs, confirming random public_id URLs, contact privacy, and XSS escaping."
+      ]
+    }
+  ]
+}
