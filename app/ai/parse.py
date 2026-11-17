@@ -30,13 +30,13 @@ def parse_ai_response(raw: str | None) -> AIResult:
 
     try:
         data = json.loads(text)
-    except json.JSONDecodeError as exc:
-        raise AIParseError("invalid_json") from exc
+    except (ValueError, RecursionError):
+        raise AIParseError("invalid_json") from None
 
     if not isinstance(data, dict):
         raise AIParseError("not_an_object")
 
     try:
         return AIResult.model_validate(data)
-    except ValidationError as exc:
-        raise AIParseError("invalid_values") from exc
+    except ValidationError:
+        raise AIParseError("invalid_values") from None
