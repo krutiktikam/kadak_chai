@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Kadak Chai Co. — Share Your #MyChaiBreak Story{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+  <h2 class="hero-title">Every cup of chai holds a story.</h2>
+  <p class="hero-subtitle">
+    From roadside cutting stalls to quiet home brews on rainy evenings, share your favorite chai ritual with the community.
+  </p>
+  <div class="rules-banner">
+    <strong>Campaign Guidelines:</strong> Stories must be about an authentic chai/tea break (10 to 2,000 characters). Keep it wholesome, friendly, and respectful. Every entry is reviewed before publication.
+  </div>
+</section>
+
+<section class="card" id="submit-section">
+  <h3 class="card-title">Brew & Share Your Chai Story</h3>
+  <form action="/submit" method="POST" novalidate>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="name">Your Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value="{{ form_data.get('name', '') }}"
+          maxlength="100"
+          placeholder="e.g. Priya Sharma"
+          class="{% if errors.get('name') %}is-invalid{% endif %}"
+          required
+        >
+        {% if errors.get('name') %}
+          <span class="error-msg">{{ errors.name }}</span>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="city">City / Town</label>
+        <input
+          type="text"
+          id="city"
+          name="city"
+          value="{{ form_data.get('city', '') }}"
+          maxlength="100"
+          placeholder="e.g. Jaipur"
+          class="{% if errors.get('city') %}is-invalid{% endif %}"
+          required
+        >
+        {% if errors.get('city') %}
+          <span class="error-msg">{{ errors.city }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="contact">Contact Information (Email or Mobile)</label>
+      <input
+        type="text"
+        id="contact"
+        name="contact"
+        value="{{ form_data.get('contact', '') }}"
+        maxlength="255"
+        placeholder="e.g. priya@example.com or +91 98765 43210"
+        class="{% if errors.get('contact') %}is-invalid{% endif %}"
+        required
+      >
+      <div class="field-hint">
+        We'll only reach out if your story is selected for our limited-edition tea tins. Never published.
+      </div>
+      {% if errors.get('contact') %}
+        <span class="error-msg">{{ errors.contact }}</span>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label for="story">Your Chai Story</label>
+      <textarea
+        id="story"
+        name="story"
+        rows="6"
+        maxlength="2000"
+        placeholder="Tell us about the setting, the aroma, the conversations, or the quiet moment that made this chai break special..."
+        class="{% if errors.get('story') %}is-invalid{% endif %}"
+        required
+      >{{ form_data.get('story', '') }}</textarea>
+      <div class="char-counter"><span id="char-count">0</span> / 2000</div>
+      {% if errors.get('story') %}
+        <span class="error-msg">{{ errors.story }}</span>
+      {% endif %}
+    </div>
+
+    <div class="form-group checkbox-group">
+      <label class="checkbox-label" for="consent">
+        <input
+          type="checkbox"
+          id="consent"
+          name="consent"
+          value="true"
+          {% if form_data.get('consent') %}checked{% endif %}
+        >
+        <span>I confirm this is my own authentic story and agree to have it featured on the Kadak Chai Co. wall if approved.</span>
+      </label>
+      {% if errors.get('consent') %}
+        <span class="error-msg">{{ errors.consent }}</span>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Chai Story</button>
+  </form>
+</section>
+
+<section class="wall-section">
+  <div class="wall-header">
+    <h3 class="wall-title">Approved #MyChaiBreak Stories</h3>
+    <p class="wall-subtitle">Recent stories celebrating warm cups and cherished moments across the country.</p>
+  </div>
+
+  {% if entries %}
+    <div class="stories-grid">
+      {% for entry in entries %}
+        <article class="story-card">
+          <div>
+            {% if entry.ai_caption %}
+              <h4 class="story-caption">“{{ entry.ai_caption }}”</h4>
+            {% endif %}
+            <p class="story-text">{{ entry.story }}</p>
+          </div>
+          <div class="story-meta">
+            <span class="story-author">{{ entry.name }} ({{ entry.city }})</span>
+            {% if entry.ai_category %}
+              <span class="badge badge-category">{{ entry.ai_category }}</span>
+            {% endif %}
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-wall-notice">
+      <p>No stories published yet. Be the first to share your chai break ritual above!</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function () {
+    var storyInput = document.getElementById("story");
+    var charCount = document.getElementById("char-count");
+    if (storyInput && charCount) {
+      function updateCount() {
+        charCount.textContent = storyInput.value.length;
+      }
+      storyInput.addEventListener("input", updateCount);
+      updateCount();
+    }
+  })();
+</script>
+{% endblock %}

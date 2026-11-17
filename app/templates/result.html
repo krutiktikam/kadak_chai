@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if entry.status == 'approved' %}
+    Approved: #MyChaiBreak Story by {{ entry.name }}
+  {% elif entry.status == 'rejected' %}
+    Story Submission Update — Kadak Chai Co.
+  {% else %}
+    Story In Review — Kadak Chai Co.
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="result-card">
+  <div class="result-header">
+    <h2 class="result-status-title">Submission Outcome</h2>
+    <div>
+      {% if entry.status == 'approved' %}
+        <span class="badge badge-approved">Approved</span>
+        {% if entry.ai_category %}
+          <span class="badge badge-category">{{ entry.ai_category }}</span>
+        {% endif %}
+      {% elif entry.status == 'rejected' %}
+        <span class="badge badge-rejected">Not Selected</span>
+      {% else %}
+        <span class="badge badge-pending">Under Review</span>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if entry.status == 'approved' %}
+    <div class="result-approved-banner">
+      <strong>Congratulations, {{ entry.name }}!</strong> Your chai story has been accepted and is now published on the public #MyChaiBreak wall.
+    </div>
+
+    {% if entry.ai_caption %}
+      <h3 class="result-caption">“{{ entry.ai_caption }}”</h3>
+    {% endif %}
+
+    <div class="result-story">{{ entry.story }}</div>
+
+    <div class="story-meta" style="margin-bottom: 1.5rem;">
+      <span class="story-author">{{ entry.name }} ({{ entry.city }})</span>
+      <span class="story-date">{{ entry.created_at.strftime('%B %d, %Y') if entry.created_at else '' }}</span>
+    </div>
+
+  {% elif entry.status == 'rejected' %}
+    <div class="result-rejected-banner">
+      <strong>Thank you for sharing with us, {{ entry.name }}.</strong>
+      {% if entry.ai_reason %}
+        <p style="margin: 0.5rem 0 0;">{{ entry.ai_reason }}</p>
+      {% else %}
+        <p style="margin: 0.5rem 0 0;">This story did not meet our current campaign theme guidelines.</p>
+      {% endif %}
+    </div>
+
+    <p style="color: var(--chai-light);">
+      Our community wall focuses specifically on authentic personal chai-break moments. We warmly invite you to submit another story about your tea-time memories!
+    </p>
+
+    <div class="result-story">{{ entry.story }}</div>
+
+  {% else %}
+    <div class="result-pending-banner">
+      <strong>Your story is currently with our review team.</strong>
+      <p style="margin: 0.5rem 0 0;">
+        Thank you for submitting, {{ entry.name }}! Our moderators review pending submissions regularly. Please check back at this link soon.
+      </p>
+    </div>
+
+    <div class="result-story">{{ entry.story }}</div>
+  {% endif %}
+
+  <div class="share-notice">
+    <strong>Bookmark or Share This Submission:</strong>
+    <p style="margin: 0 0 0.5rem; color: var(--chai-light); font-size: 0.85rem;">
+      You can return to this page anytime to view your story status.
+    </p>
+    <input type="text" readonly value="{{ request.url }}" class="share-link-input" onclick="this.select();">
+  </div>
+
+  <div class="result-actions">
+    <a href="/" class="btn btn-secondary">← Back to Stories Wall</a>
+    {% if entry.status == 'rejected' or entry.status == 'pending_review' %}
+      <a href="/#submit-section" class="btn btn-primary">Submit Another Story</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
