@@ -25,7 +25,7 @@
       <table class="admin-table">
         <thead>
           <tr><th>#</th><th>Submitted (UTC)</th><th>Name / city</th><th>Contact</th>
-              <th>Story</th><th>AI said</th><th>Status</th></tr>
+              <th>Story</th><th>AI said</th><th>Status</th><th>Action</th></tr>
         </thead>
         <tbody>
         {% for e in entries %}
@@ -47,6 +47,21 @@
             <td>
               <span class="badge {% if e.status == 'approved' %}badge-approved{% elif e.status == 'rejected' %}badge-rejected{% else %}badge-pending{% endif %}">{{ e.status }}</span>
               {% if e.admin_override %}<br><small>overridden</small>{% endif %}
+            </td>
+            <td>
+              <form action="/admin/entries/{{ e.id }}/override" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf }}">
+                <input type="hidden" name="back" value="{{ current }}">
+                {% if not e.ai_caption %}
+                  <input type="text" name="caption" maxlength="300" placeholder="Caption (needed to approve)">
+                {% endif %}
+                {% if e.status != 'approved' %}
+                  <button type="submit" name="decision" value="approved" class="btn btn-primary">Approve</button>
+                {% endif %}
+                {% if e.status != 'rejected' %}
+                  <button type="submit" name="decision" value="rejected" class="btn btn-secondary">Reject</button>
+                {% endif %}
+              </form>
             </td>
           </tr>
         {% endfor %}

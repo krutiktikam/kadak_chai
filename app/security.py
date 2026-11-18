@@ -45,3 +45,10 @@ class LoginLimiter:
 
 
 login_limiter = LoginLimiter()
+
+
+def csrf_ok(expected: str | None, given: str | None) -> bool:
+    """True only if both tokens exist and match. Constant-time, bytes for non-ASCII safety."""
+    if not expected or not given:
+        return False
+    return hmac.compare_digest(expected.encode(), given.encode())

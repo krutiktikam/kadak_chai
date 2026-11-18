@@ -7,9 +7,10 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.ai.schema import MAX_CAPTION_WORDS
 from app.db import get_db
-from app.models import Entry
-from app.security import check_credentials, login_limiter
+from app.models import Entry, utcnow
+from app.security import check_credentials, csrf_ok, login_limiter
 
 BASE_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
@@ -35,7 +36,9 @@ FILTERS = [
     ("approved", "Approved"),
     ("rejected", "Rejected"),
 ]
+FILTER_KEYS = {key for key, _ in FILTERS}
 PAGE_LIMIT = 100
+MAX_CAPTION_CHARS = 300  # matches the String(300) column
 
 
 def _login_error(request: Request, message: str, status: int):
@@ -83,8 +86,9 @@ def logout(request: Request):
 @protected.get("")
 def dashboard(request: Request, status: str = "all", db: Session = Depends(get_db)):
     # Only known values are accepted; anything else falls back to "all".
-    if status not in {key for key, _ in FILTERS}:
+    if status not in FILTER_KEYS:
         status = "all"
+    csrf = request.session.setdefault("csrf", secrets.token_urlsafe(32))
 
     query = db.query(Entry)
     if status != "all":
@@ -101,5 +105,39 @@ def dashboard(request: Request, status: str = "all", db: Session = Depends(get_d
         request=request,
         name="admin_dashboard.html",
         context={"entries": entries, "counts": counts, "filters": FILTERS,
-                 "current": status, "limit": PAGE_LIMIT},
+                 "current": status, "limit": PAGE_LIMIT, "csrf": csrf},
     )
+
+
+@protected.post("/entries/{entry_id}/override")
+def override(
+    request: Request,
+    entry_id: int,
+    decision: str = Form(default=""),
+    csrf_token: str = Form(default=""),
+    caption: str = Form(default=""),
+    back: str = Form(default="all"),
+    db: Session = Depends(get_db),
+):
+    if not csrf_ok(request.session.get("csrf"), csrf_token):
+        raise HTTPException(status_code=403, detail="Invalid CSRF token")
+    if decision not in ("approved", "rejected"):
+        raise HTTPException(status_code=400, detail="Invalid decision")
+
+    entry = db.get(Entry, entry_id)
+    if entry is None:
+        raise HTTPException(status_code=404, detail="Entry not found")
+
+    if decision == "approved" and not entry.ai_caption:
+        clean = " ".join(caption.split())
+        if not clean or len(clean.split()) > MAX_CAPTION_WORDS or len(clean) > MAX_CAPTION_CHARS:
+            raise HTTPException(status_code=400, detail="A caption of 1-12 words is needed to approve")
+        entry.ai_caption = clean
+
+    entry.status = decision          # what the site does
+    entry.admin_override = True      # ai_decision is never touched: it records what the AI said
+    entry.reviewed_at = utcnow()
+    db.commit()
+
+    back = back if back in FILTER_KEYS else "all"   # never redirect to a client-supplied URL
+    return RedirectResponse(f"/admin?status={back}", status_code=303)
