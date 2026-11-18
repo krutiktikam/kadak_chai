@@ -106,5 +106,5 @@ def test_csrf_ok_empty_strings():
 
 # 14. csrf_ok("tökén", "tökén") and a mismatched non-ASCII pair -> True, then False, no exception
 def test_csrf_ok_non_ascii():
-    assert csrf_ok("tökén", "tökén") is True
-    assert csrf_ok("tökén", "tökën") is False
+    assert csrf_ok("t\u00f6k\u00e9n", "t\u00f6k\u00e9n") is True
+    assert csrf_ok("t\u00f6k\u00e9n", "t\u00f6k\u00ebn") is False
