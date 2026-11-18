@@ -2,10 +2,59 @@
 {% block title %}Admin — Kadak Chai Co.{% endblock %}
 {% block content %}
 <section class="card">
-  <h3 class="card-title">Admin dashboard</h3>
-  <p>Logged in. The entry list arrives in Step 3.</p>
-  <form action="/admin/logout" method="POST">
-    <button type="submit" class="btn btn-secondary">Log out</button>
-  </form>
+  <div class="admin-bar">
+    <h3 class="card-title">Entries</h3>
+    <form action="/admin/logout" method="POST">
+      <button type="submit" class="btn btn-secondary">Log out</button>
+    </form>
+  </div>
+
+  <nav class="filter-bar" aria-label="Filter by status">
+    {% for key, label in filters %}
+      <a href="/admin?status={{ key }}" class="filter-link{% if key == current %} is-active{% endif %}">
+        {{ label }} ({{ counts[key] }})
+      </a>
+    {% endfor %}
+  </nav>
+
+  {% if entries %}
+    {% if counts[current] > limit %}
+      <p><small>Showing the newest {{ limit }} of {{ counts[current] }}.</small></p>
+    {% endif %}
+    <div class="table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr><th>#</th><th>Submitted (UTC)</th><th>Name / city</th><th>Contact</th>
+              <th>Story</th><th>AI said</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+        {% for e in entries %}
+          <tr>
+            <td>{{ e.id }}</td>
+            <td>{{ e.created_at.strftime('%d %b %Y %H:%M') }}</td>
+            <td>{{ e.name }}<br><small>{{ e.city }}</small></td>
+            <td>{{ e.contact }}<br><small>{{ e.contact_type }}</small></td>
+            <td class="story-cell">{{ e.story }}</td>
+            <td>
+              {% if e.ai_decision %}
+                {{ e.ai_decision }} / {{ e.ai_category }}<br>
+                “{{ e.ai_caption }}”
+                {% if e.ai_reason %}<br><small>Reason: {{ e.ai_reason }}</small>{% endif %}
+              {% else %}
+                <small>AI failed: {{ e.ai_error or 'unknown' }}</small>
+              {% endif %}
+            </td>
+            <td>
+              <span class="badge {% if e.status == 'approved' %}badge-approved{% elif e.status == 'rejected' %}badge-rejected{% else %}badge-pending{% endif %}">{{ e.status }}</span>
+              {% if e.admin_override %}<br><small>overridden</small>{% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p>No entries here.</p>
+  {% endif %}
 </section>
 {% endblock %}

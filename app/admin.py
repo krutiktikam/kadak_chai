@@ -4,7 +4,11 @@ from pathlib import Path
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
+from app.db import get_db
+from app.models import Entry
 from app.security import check_credentials, login_limiter
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -24,6 +28,14 @@ def client_ip(request: Request) -> str:
 
 router = APIRouter(prefix="/admin")  # public: login and logout only
 protected = APIRouter(prefix="/admin", dependencies=[Depends(require_admin)])  # everything else
+
+FILTERS = [
+    ("all", "All"),
+    ("pending_review", "Pending review"),
+    ("approved", "Approved"),
+    ("rejected", "Rejected"),
+]
+PAGE_LIMIT = 100
 
 
 def _login_error(request: Request, message: str, status: int):
@@ -69,6 +81,25 @@ def logout(request: Request):
 
 
 @protected.get("")
-def dashboard(request: Request):
-    # Placeholder. Step 3 replaces this with the real entry list.
-    return templates.TemplateResponse(request=request, name="admin_dashboard.html", context={})
+def dashboard(request: Request, status: str = "all", db: Session = Depends(get_db)):
+    # Only known values are accepted; anything else falls back to "all".
+    if status not in {key for key, _ in FILTERS}:
+        status = "all"
+
+    query = db.query(Entry)
+    if status != "all":
+        query = query.filter(Entry.status == status)
+    entries = query.order_by(Entry.created_at.desc(), Entry.id.desc()).limit(PAGE_LIMIT).all()
+
+    rows = db.query(Entry.status, func.count(Entry.id)).group_by(Entry.status).all()
+    counts = {key: 0 for key, _ in FILTERS}
+    for entry_status, n in rows:
+        counts[entry_status] = n
+    counts["all"] = sum(n for _, n in rows)
+
+    return templates.TemplateResponse(
+        request=request,
+        name="admin_dashboard.html",
+        context={"entries": entries, "counts": counts, "filters": FILTERS,
+                 "current": status, "limit": PAGE_LIMIT},
+    )

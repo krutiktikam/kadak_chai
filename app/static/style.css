@@ -523,3 +523,14 @@ textarea.is-invalid {
   color: var(--chai-light);
   font-size: 0.9rem;
 }
+
+
+/* Admin Dashboard Table & Filters */
+.admin-bar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.filter-bar { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; }
+.filter-link { padding: .4rem .8rem; border: 1px solid currentColor; border-radius: 999px; text-decoration: none; }
+.filter-link.is-active { font-weight: 700; text-decoration: underline; }
+.table-wrap { overflow-x: auto; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.admin-table th, .admin-table td { text-align: left; vertical-align: top; padding: .5rem; border-bottom: 1px solid #ddd; }
+.story-cell { min-width: 14rem; white-space: pre-wrap; overflow-wrap: anywhere; }
