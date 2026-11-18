@@ -7,12 +7,17 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+from starlette.middleware.sessions import SessionMiddleware
 
-from app import config
+from app import admin, config
 from app.ai import analyze_story
 from app.db import Base, engine, get_db
 from app.models import Entry, utcnow
-from app.validation import SubmissionValidationError, validate_submission
+from app.validation import (
+    MAX_STORY_LENGTH,
+    SubmissionValidationError,
+    validate_submission,
+)
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -27,6 +32,16 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=config.SECRET_KEY,
+    max_age=8 * 60 * 60,  # 8 hours, enforced on the signature, not just the cookie
+    same_site="lax",
+    https_only=config.COOKIE_SECURE,
+)
+app.include_router(admin.router)
+app.include_router(admin.protected)
 
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
@@ -50,7 +65,12 @@ def index(request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse(
         request=request,
         name="index.html",
-        context={"entries": approved_entries, "errors": {}, "form_data": {}},
+        context={
+            "entries": approved_entries,
+            "errors": {},
+            "form_data": {},
+            "max_story_length": MAX_STORY_LENGTH,
+        },
     )
 
 
@@ -88,6 +108,7 @@ def submit_story(
                     "story": story,
                     "consent": consent,
                 },
+                "max_story_length": MAX_STORY_LENGTH,
             },
             status_code=422,
         )

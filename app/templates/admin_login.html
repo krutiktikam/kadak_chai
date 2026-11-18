@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Admin login — Kadak Chai Co.{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">Admin login</h3>
+  <form action="/admin/login" method="POST">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" autocomplete="username" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" autocomplete="current-password" required>
+    </div>
+    {% if error %}<span class="error-msg">{{ error }}</span>{% endif %}
+    <button type="submit" class="btn btn-primary">Log in</button>
+  </form>
+</section>
+{% endblock %}

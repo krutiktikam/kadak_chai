@@ -29,5 +29,8 @@ ADMIN_USERNAME = _required("ADMIN_USERNAME")
 ADMIN_PASSWORD = _required("ADMIN_PASSWORD")
 SECRET_KEY = _required("SECRET_KEY")
 
+# Send the session cookie over HTTPS only. Keep off for local http://127.0.0.1, turn on when deployed.
+COOKIE_SECURE = os.environ.get("COOKIE_SECURE", "").strip().lower() in ("1", "true", "yes")
+
 # Database. SQLite file by default; a hosted Postgres URL when deployed.
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./kadak.db")

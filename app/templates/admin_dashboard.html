@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Admin — Kadak Chai Co.{% endblock %}
+{% block content %}
+<section class="card">
+  <h3 class="card-title">Admin dashboard</h3>
+  <p>Logged in. The entry list arrives in Step 3.</p>
+  <form action="/admin/logout" method="POST">
+    <button type="submit" class="btn btn-secondary">Log out</button>
+  </form>
+</section>
+{% endblock %}
