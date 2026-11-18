@@ -7,7 +7,7 @@ Core rules:
   * Emails are normalised to lowercase.
   * Phone numbers are stripped of delimiters/formatting.
   * Contact type must be 'email' or 'phone'.
-- Story: 10-2000 characters, whitespace-trimmed (newlines preserved).
+- Story: 10-300 characters, whitespace-trimmed (newlines preserved).
 - Consent: Must be explicitly granted (truthy boolean or checkbox values like 'on', 'true', '1').
 - Error handling: Collects all field errors simultaneously so user forms can highlight
   every invalid field in a single round-trip.
@@ -23,7 +23,7 @@ MAX_NAME_LENGTH = 100
 MAX_CITY_LENGTH = 100
 MAX_CONTACT_LENGTH = 255
 MIN_STORY_LENGTH = 10
-MAX_STORY_LENGTH = 2000
+MAX_STORY_LENGTH = 300
 
 # Regex for email validation
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
@@ -140,7 +140,7 @@ def validate_submission(
         name: Submitter's full name (1-100 chars).
         city: Submitter's city (1-100 chars).
         contact: Email address or phone number (up to 255 chars).
-        story: Chai story text (10-2000 chars).
+        story: Chai story text (10-300 chars).
         consent: Explicit agreement to campaign terms (truthy value).
 
     Returns:

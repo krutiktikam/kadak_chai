@@ -48,7 +48,7 @@ def client(test_db, monkeypatch):
 
 
 def test_get_index_renders_form_and_only_approved_stories(client, test_db):
-    """GET / should display the submission form and approved entries, never unapproved ones or private contacts."""
+    """GET / should display the submission form and approved entries (first name and caption only)."""
     with test_db() as session:
         # 1. Approved entry
         approved_entry = Entry(
@@ -97,10 +97,18 @@ def test_get_index_renders_form_and_only_approved_stories(client, test_db):
     assert response.status_code == 200
 
     html = response.text
-    # Approved content must be visible
-    assert "Rohan Verma" in html
-    assert "Mumbai" in html
+    # Check dynamic 300-char story limits in template
+    assert "10 to 300 characters" in html
+    assert 'maxlength="300"' in html
+    assert "/ 300" in html
+
+    # Approved first name and caption must be visible
+    assert "Rohan" in html
     assert "Marine Drive cutting chai sets the morning tone." in html
+
+    # Privacy enforcement: city and full story must NOT be rendered on public wall
+    assert "Mumbai" not in html
+    assert "Every morning, cutting chai by Marine Drive" not in html
 
     # Unapproved content must NOT appear
     assert "Spam Bot" not in html
@@ -151,7 +159,10 @@ def test_post_submit_valid_chai_story_redirects_and_approves(client, test_db):
     result_html = result_response.text
     assert "Approved" in result_html
     assert caption in result_html
-    assert "Aarav Sharma" in result_html
+    assert "Aarav" in result_html
+    # Privacy check: full story, city, and full name are removed
+    assert "Jaipur" not in result_html
+    assert "Every evening at five, my grandmother brewed" not in result_html
 
 
 def test_post_submit_spam_story_rejects_and_does_not_show_on_index(client, test_db):
@@ -176,23 +187,25 @@ def test_post_submit_spam_story_rejects_and_does_not_show_on_index(client, test_
         assert entry is not None
         assert entry.status == "rejected"
         assert entry.ai_reason is not None
-        ai_reason = entry.ai_reason
 
-    # Result page shows rejection reason
+    # Result page shows generic rejection notice without leaking ai_reason or story
     result_resp = client.get(location)
     assert result_resp.status_code == 200
     assert "Not Selected" in result_resp.text
-    assert ai_reason in result_resp.text
+    assert "did not meet our campaign guidelines" in result_resp.text
+    # Privacy check: internal ai_reason, story, and name are not leaked
+    assert "crypto" not in result_resp.text
+    assert "Spam Advertiser" not in result_resp.text
 
     # Wall check: must not appear on GET /
     index_resp = client.get("/")
     assert index_resp.status_code == 200
-    assert "Spam Advertiser" not in index_resp.text
+    assert "Spam" not in index_resp.text
     assert "http://spam.example" not in index_resp.text
 
 
 def test_post_submit_mock_broken_becomes_pending_review_without_leaking_error(client, test_db):
-    """POST /submit when AI fails routes to pending_review without leaking technical error code."""
+    """POST /submit when AI fails routes to pending_review with generic notice without leaking error."""
     payload = {
         "name": "Divya Rao",
         "city": "Bengaluru",
@@ -214,11 +227,13 @@ def test_post_submit_mock_broken_becomes_pending_review_without_leaking_error(cl
         assert entry.status == "pending_review"
         assert entry.ai_error == "invalid_json"
 
-    # Result page shows reassuring message and NEVER leaks "invalid_json"
+    # Result page shows reassuring generic message and NEVER leaks "invalid_json", story, or name
     result_resp = client.get(location)
     assert result_resp.status_code == 200
-    assert "review team" in result_resp.text.lower()
+    assert "review" in result_resp.text.lower()
     assert "invalid_json" not in result_resp.text
+    assert "Divya" not in result_resp.text
+    assert "Chai mock-broken" not in result_resp.text
 
 
 def test_post_submit_validation_errors_returns_422_and_preserves_input(client):
@@ -247,13 +262,27 @@ def test_post_submit_validation_errors_returns_422_and_preserves_input(client):
     assert "Short" in html
 
 
+def test_post_submit_story_too_long_returns_422(client):
+    """Submitting a story longer than 300 characters returns HTTP 422."""
+    payload = {
+        "name": "Story Writer",
+        "city": "Varanasi",
+        "contact": "writer@example.com",
+        "story": "Chai " * 65,  # 325 characters (> 300)
+        "consent": "true",
+    }
+    response = client.post("/submit", data=payload)
+    assert response.status_code == 422
+    assert "Story must be 300 characters or fewer." in response.text
+
+
 def test_get_result_nonexistent_and_numeric_id_returns_404(client, test_db):
     """GET /result/{public_id} returns 404 for non-existent public IDs and numeric internal IDs."""
     with test_db() as session:
         entry = Entry(
             id=1,
             public_id="real-public-id-abc123xyz",
-            name="Sunil",
+            name="Sunil Kumar",
             city="Chennai",
             contact="sunil@example.com",
             contact_type="email",
@@ -261,6 +290,7 @@ def test_get_result_nonexistent_and_numeric_id_returns_404(client, test_db):
             consent=True,
             consent_at=utcnow(),
             status="approved",
+            ai_caption="Sunrise chai at Marina Beach",
         )
         session.add(entry)
         session.commit()
@@ -273,10 +303,11 @@ def test_get_result_nonexistent_and_numeric_id_returns_404(client, test_db):
     resp_nonexistent = client.get("/result/nonexistent-public-id-99999")
     assert resp_nonexistent.status_code == 404
 
-    # Valid public_id works
+    # Valid public_id works and shows first name only
     resp_valid = client.get("/result/real-public-id-abc123xyz")
     assert resp_valid.status_code == 200
     assert "Sunil" in resp_valid.text
+    assert "Kumar" not in resp_valid.text
 
 
 def test_xss_protection_escapes_user_input(client):

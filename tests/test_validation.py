@@ -88,7 +88,7 @@ def test_validate_submission_boundary_lengths():
     exact_100_name = "N" * MAX_NAME_LENGTH
     exact_100_city = "C" * MAX_CITY_LENGTH
     exact_10_story = "S" * MIN_STORY_LENGTH
-    exact_2000_story = "A" * MAX_STORY_LENGTH
+    exact_300_story = "A" * MAX_STORY_LENGTH
 
     result = validate_submission(
         name=exact_100_name,
@@ -105,7 +105,7 @@ def test_validate_submission_boundary_lengths():
         name="Valid Name",
         city="Valid City",
         contact="boundary@example.com",
-        story=exact_2000_story,
+        story=exact_300_story,
         consent=True,
     )
     assert len(result_long_story.story) == MAX_STORY_LENGTH
@@ -229,7 +229,7 @@ def test_validate_submission_invalid_contact(invalid_contact: str):
         "\t\n   \n",
         "Short",  # < 10 chars
         "123456789",  # 9 chars
-        "S" * (MAX_STORY_LENGTH + 1),  # > 2000 chars
+        "S" * (MAX_STORY_LENGTH + 1),  # > 300 chars
     ],
 )
 def test_validate_submission_invalid_story(invalid_story: str):

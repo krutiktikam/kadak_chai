@@ -9,7 +9,7 @@
     From roadside cutting stalls to quiet home brews on rainy evenings, share your favorite chai ritual with the community.
   </p>
   <div class="rules-banner">
-    <strong>Campaign Guidelines:</strong> Stories must be about an authentic chai/tea break (10 to 2,000 characters). Keep it wholesome, friendly, and respectful. Every entry is reviewed before publication.
+    <strong>Campaign Guidelines:</strong> Stories must be about an authentic chai/tea break (10 to {{ max_story_length }} characters). Keep it wholesome, friendly, and respectful. Every entry is reviewed before publication.
   </div>
 </section>
 
@@ -78,12 +78,12 @@
         id="story"
         name="story"
         rows="6"
-        maxlength="2000"
+        maxlength="{{ max_story_length }}"
         placeholder="Tell us about the setting, the aroma, the conversations, or the quiet moment that made this chai break special..."
         class="{% if errors.get('story') %}is-invalid{% endif %}"
         required
       >{{ form_data.get('story', '') }}</textarea>
-      <div class="char-counter"><span id="char-count">0</span> / 2000</div>
+      <div class="char-counter"><span id="char-count">0</span> / {{ max_story_length }}</div>
       {% if errors.get('story') %}
         <span class="error-msg">{{ errors.story }}</span>
       {% endif %}
@@ -123,10 +123,9 @@
             {% if entry.ai_caption %}
               <h4 class="story-caption">“{{ entry.ai_caption }}”</h4>
             {% endif %}
-            <p class="story-text">{{ entry.story }}</p>
           </div>
           <div class="story-meta">
-            <span class="story-author">{{ entry.name }} ({{ entry.city }})</span>
+            <span class="story-author">— {{ entry.name.split()[0] }}</span>
             {% if entry.ai_category %}
               <span class="badge badge-category">{{ entry.ai_category }}</span>
             {% endif %}
