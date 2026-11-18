@@ -52,7 +52,7 @@
               <form action="/admin/entries/{{ e.id }}/override" method="POST">
                 <input type="hidden" name="csrf_token" value="{{ csrf }}">
                 <input type="hidden" name="back" value="{{ current }}">
-                {% if not e.ai_caption %}
+                {% if not e.ai_caption or e.ai_decision == 'rejected' %}
                   <input type="text" name="caption" maxlength="300" placeholder="Caption (needed to approve)">
                 {% endif %}
                 {% if e.status != 'approved' %}

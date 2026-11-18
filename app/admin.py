@@ -128,7 +128,7 @@ def override(
     if entry is None:
         raise HTTPException(status_code=404, detail="Entry not found")
 
-    if decision == "approved" and not entry.ai_caption:
+    if decision == "approved" and (not entry.ai_caption or entry.ai_decision == "rejected"):
         clean = " ".join(caption.split())
         if not clean or len(clean.split()) > MAX_CAPTION_WORDS or len(clean) > MAX_CAPTION_CHARS:
             raise HTTPException(status_code=400, detail="A caption of 1-12 words is needed to approve")
