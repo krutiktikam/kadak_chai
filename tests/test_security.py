@@ -1,7 +1,7 @@
 import pytest
 
 from app import config
-from app.security import LoginLimiter, check_credentials
+from app.security import LoginLimiter, check_credentials, csrf_ok
 
 
 @pytest.fixture
@@ -80,3 +80,31 @@ def test_limiter_reset_clears_failures():
 
     limiter.reset("10.0.0.1")
     assert limiter.is_blocked("10.0.0.1") is False
+
+
+# 10. csrf_ok("abc", "abc") -> True
+def test_csrf_ok_matching():
+    assert csrf_ok("abc", "abc") is True
+
+
+# 11. csrf_ok("abc", "abd") -> False
+def test_csrf_ok_mismatch():
+    assert csrf_ok("abc", "abd") is False
+
+
+# 12. csrf_ok(None, "abc") and csrf_ok("abc", None) -> False
+def test_csrf_ok_none_values():
+    assert csrf_ok(None, "abc") is False
+    assert csrf_ok("abc", None) is False
+    assert csrf_ok(None, None) is False
+
+
+# 13. csrf_ok("", "") (two empty strings) -> False
+def test_csrf_ok_empty_strings():
+    assert csrf_ok("", "") is False
+
+
+# 14. csrf_ok("tökén", "tökén") and a mismatched non-ASCII pair -> True, then False, no exception
+def test_csrf_ok_non_ascii():
+    assert csrf_ok("tökén", "tökén") is True
+    assert csrf_ok("tökén", "tökën") is False
