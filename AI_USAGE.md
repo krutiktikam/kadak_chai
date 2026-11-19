@@ -28,3 +28,5 @@ This project was built using an **AI-First, Human-Verified** workflow across fou
 - **Reasoning Token JSON Truncation (`S3`):** `max_tokens=200` truncated JSON output mid-string because `openai/gpt-oss-20b` uses ~166 reasoning tokens first. Caught by parser tests and raised to `max_tokens=500`.
 - **Story Max Length (`2000` vs `300`):** Initial validation and UI counter used 2,000 characters instead of the brief's 300-character maximum. Caught in Phase 4 review and fixed across `app/validation.py`, `index.html`, and tests.
 - **Rejected Dependency (`httpx2`):** Starlette's `TestClient` emitted a deprecation warning suggesting `httpx2`; rejected installing an unapproved/unneeded package.
+
+- **Imprecise Sabotage Prediction (S4):** Predicted that removing the CSRF check would fail both Test 9 and Test 13/14; only Test 9 failed (400 == 403) because Tests 13 and 14 send valid tokens.

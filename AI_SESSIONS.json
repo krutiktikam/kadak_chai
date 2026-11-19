@@ -3,7 +3,8 @@
   "tools": {
     "S1": "Claude (Web) — Architecture planning, pair-programming guidance, initial skeletons",
     "S2": "Antigravity (IDE Agent) — Test scaffolding, Jinja2/CSS templates, route implementation",
-    "S3": "Gemini (Web) — Live Groq debugging, orchestrator & test suite authoring, Phase 3 TDD workflow"
+    "S3": "Gemini (Web) — Live Groq debugging, orchestrator & test suite authoring, Phase 3 TDD workflow",
+    "S4": "Claude (Web) ? Phase 4 admin security, signed session cookies, CSRF override, and Phase 5 review"
   },
   "sessions": [
     {
@@ -51,6 +52,30 @@
       "human_decisions": [
         "Hand-wrote the entire core validation and contact normalisation logic in app/validation.py against the 69-test TDD suite.",
         "Verified live end-to-end submission flow in browser and Swagger /docs, confirming random public_id URLs, contact privacy, and XSS escaping."
+      ]
+    },
+    {
+      "id": "S4-04",
+      "tool": "S4",
+      "phase": "Phase 4 ? Admin Dashboard, Auth & CSRF Override",
+      "commits": [
+        "8ca160b",
+        "1578585",
+        "3b3d4bd",
+        "ca7f4c5",
+        "1c693b0",
+        "6a4f26a"
+      ],
+      "scope": [
+        "app/security.py (constant-time check_credentials, LoginLimiter, csrf_ok)",
+        "app/admin.py (signed HttpOnly SameSite=Lax session cookies, require_admin guard, status filter, CSRF-protected override)",
+        "app/templates/{admin_login,admin_dashboard}.html & app/static/style.css",
+        "tests/test_security.py (14 unit tests) & tests/test_admin.py (17 integration & access-control tests)"
+      ],
+      "human_decisions": [
+        "Hand-wrote all 14 unit tests in tests/test_security.py and all 17 route/security tests in tests/test_admin.py.",
+        "Required admins to enter a fresh 1-12 word caption when overriding an AI-rejected entry to approved so AI rejection captions never publish to the wall.",
+        "Verified CSRF enforcement via deliberate sabotage run and tightened AI_PROVIDER validation in app/config.py."
       ]
     }
   ]

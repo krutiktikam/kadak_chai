@@ -69,11 +69,19 @@ def get_csrf_token(client: TestClient) -> str:
 def test_every_admin_route_requires_login(client):
     """1. Anonymous requests to protected /admin routes return 303 to /admin/login."""
     checked = 0
+    discovered = []
     for route in app.routes:
-        path = getattr(route, "path", "")
+        orig = getattr(route, "original_router", None)
+        if orig is not None:
+            prefix = getattr(getattr(route, "include_context", None), "prefix", "")
+            for sub in orig.routes:
+                discovered.append((prefix + getattr(sub, "path", ""), getattr(sub, "methods", set()) or {"GET"}))
+        else:
+            discovered.append((getattr(route, "path", ""), getattr(route, "methods", set()) or {"GET"}))
+
+    for path, methods in discovered:
         if path.startswith("/admin") and path not in ("/admin/login", "/admin/logout"):
             test_path = path.replace("{entry_id}", "1")
-            methods = getattr(route, "methods", set()) or {"GET"}
             for method in methods:
                 if method == "HEAD":
                     continue

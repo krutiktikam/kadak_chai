@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+﻿{% extends "base.html" %}
 
-{% block title %}Kadak Chai Co. — Share Your #MyChaiBreak Story{% endblock %}
+{% block title %}Kadak Chai Co. â€” Share Your #MyChaiBreak Story{% endblock %}
 
 {% block content %}
 <section class="hero-section">
@@ -9,7 +9,7 @@
     From roadside cutting stalls to quiet home brews on rainy evenings, share your favorite chai ritual with the community.
   </p>
   <div class="rules-banner">
-    <strong>Campaign Guidelines:</strong> Stories must be about an authentic chai/tea break (10 to {{ max_story_length }} characters). Keep it wholesome, friendly, and respectful. Every entry is reviewed before publication.
+    <strong>Campaign Guidelines:</strong> Stories must be about an authentic chai/tea break (10 to {{ max_story_length }} characters). Keep it wholesome, friendly, and respectful. Every entry is screened by AI and moderated before appearing on the wall.
   </div>
 </section>
 
@@ -65,7 +65,7 @@
         required
       >
       <div class="field-hint">
-        We'll only reach out if your story is selected for our limited-edition tea tins. Never published.
+        We'll only reach out if your story is featured in the campaign. Never published.
       </div>
       {% if errors.get('contact') %}
         <span class="error-msg">{{ errors.contact }}</span>
@@ -121,11 +121,11 @@
         <article class="story-card">
           <div>
             {% if entry.ai_caption %}
-              <h4 class="story-caption">“{{ entry.ai_caption }}”</h4>
+              <h4 class="story-caption">â€œ{{ entry.ai_caption }}â€</h4>
             {% endif %}
           </div>
           <div class="story-meta">
-            <span class="story-author">— {{ entry.name.split()[0] }}</span>
+            <span class="story-author">â€” {{ entry.name.split()[0] }}</span>
             {% if entry.ai_category %}
               <span class="badge badge-category">{{ entry.ai_category }}</span>
             {% endif %}
@@ -156,3 +156,4 @@
   })();
 </script>
 {% endblock %}
+

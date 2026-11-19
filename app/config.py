@@ -1,4 +1,4 @@
-import os
+﻿import os
 
 from dotenv import load_dotenv
 
@@ -18,8 +18,10 @@ def _required(name: str) -> str:
     return value
 
 
-# AI settings. "mock" needs no key. Anything else means "call the real provider".
+# AI settings. Must be explicitly "mock" or "real" so typos fail loudly at startup.
 AI_PROVIDER = os.environ.get("AI_PROVIDER", "mock").strip().lower()
+if AI_PROVIDER not in ("mock", "real"):
+    raise ValueError(f"AI_PROVIDER must be 'mock' or 'real', got {AI_PROVIDER!r}")
 AI_BASE_URL = os.environ.get("AI_BASE_URL", "").strip()
 AI_API_KEY = os.environ.get("AI_API_KEY", "").strip()
 AI_MODEL = os.environ.get("AI_MODEL", "").strip()
