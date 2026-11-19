@@ -30,3 +30,5 @@ This project was built using an **AI-First, Human-Verified** workflow across fou
 - **Rejected Dependency (`httpx2`):** Starlette's `TestClient` emitted a deprecation warning suggesting `httpx2`; rejected installing an unapproved/unneeded package.
 
 - **Imprecise Sabotage Prediction (S4):** Predicted that removing the CSRF check would fail both Test 9 and Test 13/14; only Test 9 failed (400 == 403) because Tests 13 and 14 send valid tokens.
+
+- Phase 4 route walk spec (`app.routes`): Claude specified iterating `app.routes` and checking `route.path`, which returned `0` routes in FastAPI 0.163.1 when `test_admin.py` ran first because `include_router` stores lazy `_IncludedRouter` objects (`path=None`). Caught by Test 2 (`assert checked >= 2`) and fixed by unpacking `original_router` and `include_context.prefix`.
