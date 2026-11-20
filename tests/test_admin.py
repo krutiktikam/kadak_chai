@@ -160,11 +160,21 @@ def test_logout_redirects_and_clears_session(client):
 
 
 def test_tampered_or_invalid_secret_session_cookie_redirects_303(client):
-    """8. Send a cookie signed with a different secret or tampered value -> 303 to /admin/login."""
+    """8. Cookie signed with a different secret or tampered value -> 303 to /admin/login."""
+    from itsdangerous import URLSafeTimedSerializer
+
+    # 1. Real cookie signed with a completely different secret key
+    forged = URLSafeTimedSerializer("a-completely-different-secret-key").dumps({"user": "test-admin"})
+    client.cookies.set("session", forged)
+    r_forged = client.get("/admin")
+    assert r_forged.status_code == 303
+    assert r_forged.headers.get("location") == "/admin/login"
+
+    # 2. Tampered / invalid signature string
     client.cookies.set("session", "tampered-invalid-signature-cookie")
-    r = client.get("/admin")
-    assert r.status_code == 303
-    assert r.headers.get("location") == "/admin/login"
+    r_tampered = client.get("/admin")
+    assert r_tampered.status_code == 303
+    assert r_tampered.headers.get("location") == "/admin/login"
 
 
 # ==============================================================================
