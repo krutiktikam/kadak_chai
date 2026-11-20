@@ -139,7 +139,7 @@ app/
 tests/             pytest suite
 AI_USAGE.md        how AI was used, with mistakes caught
 AI_SESSIONS.json   index of AI sessions
-ai-logs/           exported Antigravity sessions (S2, S5); web chats are linked in AI_SESSIONS.json
+ai-logs/           raw Antigravity transcript (S2, one secret redacted); web chats are linked in AI_SESSIONS.json
 ```
 
 ## AI usage

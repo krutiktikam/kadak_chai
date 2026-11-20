@@ -17,7 +17,7 @@
         "app/ai/schema.py", "app/ai/mock.py", "app/ai/client.py"
       ],
       "kept": "Config, DB model, AI result schema and mock provider, mostly as drafted",
-      "changed": "Switched AI_MODEL to openai/gpt-oss-20b after live 404s; removed response_format after a live 400; raised max_tokens from 200 to 500 after truncated JSON; pinned dependency versions; parser was written by me against the spec and then fixed after review (from None, RecursionError handling)",
+      "changed": "Switched AI_MODEL to openai/gpt-oss-20b after live 404s; removed response_format after a live 400; raised max_tokens from 200 to 500 after truncated JSON; pinned dependency versions. I wrote the parser and its tests against the S1 spec; S1 reviewed them and I fixed the findings (from None, RecursionError handling)",
       "rejected": [],
       "mistakes_caught": [
         { "what": "Parser spec let exception chains carry story text into tracebacks", "how": "Review, then a traceback assertion that failed before the fix" },
@@ -30,21 +30,31 @@
       "id": "S2",
       "tool": "Antigravity",
       "model": "gemini-3.8-flash-high",
-      "date": "2026-11-17",
-      "goal": "Public pages: templates, CSS, submit flow, result page, route tests",
-      "log": "ai-logs/S2-antigravity.md",
+      "date": "2026-11-17 to 2026-11-20",
+      "goal": "One continuous Antigravity thread (667 steps). Steps 0-58: client fix. 59-230: public flow and validation.py. 231-448: saved S4's admin code and wrote admin tests. 449-559: first drafts of the documents. 560-667: the 300-limit test and log extraction",
+      "log": "ai-logs/S2-antigravity.jsonl",
       "share_link": null,
-      "commits": ["bdb40e8"],
+      "commits": ["bdb40e8", "c135a4a", "727dc77", "d637bce", "2639376", "9f7574e", "2606388"],
       "files": [
-        "app/main.py", "app/static/style.css", "app/templates/base.html",
-        "app/templates/index.html", "app/templates/result.html", "tests/test_public_routes.py"
+        "app/validation.py", "app/main.py", "app/config.py", "app/ai/client.py",
+        "app/static/style.css", "app/templates/base.html", "app/templates/index.html",
+        "app/templates/result.html", "app/security.py", "app/admin.py",
+        "app/templates/admin_login.html", "app/templates/admin_dashboard.html",
+        "tests/test_public_routes.py", "tests/test_validation.py", "tests/test_security.py",
+        "tests/test_admin.py", "README.md", "AI_USAGE.md", "AI_SESSIONS.json"
       ],
-      "kept": "Template structure, CSS palette, 303 redirect after submit, seven route tests",
-      "changed": "Public wall reduced to first name and caption only; character limit changed from 2000 to 300; false and invented marketing copy replaced",
-      "rejected": [],
+      "kept": "Template structure, CSS palette, 303 redirect after submit, route tests; validation.py as written from my rule checklist; S4's admin code as saved",
+      "changed": "Public wall reduced to first name and caption only; character limit changed from 2000 to 300 (d637bce); false and invented marketing copy replaced; AI_PROVIDER check added; documents rewritten after Claude review; reconstructed summary logs removed",
+      "rejected": ["Summary files written into ai-logs/ as if they were raw exports"],
       "mistakes_caught": [
         { "what": "My prompt asked for a 0 / 2000 counter and for story and city on the public wall; the brief says 300 characters and my privacy rule says first name and caption only", "how": "Claude review against the brief, fixed in d637bce" },
-        { "what": "index.html said every entry is reviewed before publication and promised limited-edition tea tins", "how": "Claude review, fixed in d5a36c7 and 949a0c4" }
+        { "what": "index.html said every entry is reviewed before publication and promised limited-edition tea tins", "how": "Claude review, fixed in d5a36c7 and 949a0c4" },
+        { "what": "First README described mock triggers that do not exist and an AI_PROVIDER value (groq) that config.py rejects", "how": "Claude compared it with mock.py and config.py" },
+        { "what": "First documents listed ai_error codes (api_down, schema_error) that the code never writes, and said ai_decision is 'rejected' when the AI fails", "how": "Claude compared it with analyze_story()" },
+        { "what": "First documents labelled paraphrased text as verbatim prompts and wrote summary files into ai-logs/ as if they were exports", "how": "Claude review; I removed them" },
+        { "what": "validation.py, its commit message and my own notes called it hand-written, but Antigravity wrote it (step 92) from my rule checklist", "how": "I read the raw Antigravity log against my claims; corrected in AI_USAGE.md" },
+        { "what": "Antigravity read .env and printed a real Groq API key into its own transcript (steps 32 and 269)", "how": "Scanned the log before committing; replaced with [REDACTED] and rotated the key" },
+        { "what": "Antigravity copied the same transcript into two files and presented them as two sessions", "how": "Compared checksums; kept one file" }
       ]
     },
     {
@@ -55,13 +65,13 @@
       "goal": "analyze_story orchestrator and a 69-test specification for validation",
       "log": null,
       "share_link": "https://share.gemini.google/0GayTQRjP05b",
-      "commits": ["823100c", "727dc77", "c135a4a", "d637bce"],
+      "commits": ["823100c"],
       "files": ["app/ai/__init__.py", "tests/test_ai.py", "tests/test_validation.py"],
       "kept": "analyze_story with the pending_review fallback; the validation tests as a specification",
-      "changed": "Implemented app/validation.py by hand against the 69 tests; story limit changed to 300 in d637bce",
+      "changed": "The validation tests were later edited by Antigravity (300-character limit). app/validation.py itself was implemented by Antigravity (S2), not by Gemini",
       "rejected": [],
       "mistakes_caught": [
-        { "what": "The generated tests named and commented the story limit as 2000 and built stories from MAX_STORY_LENGTH, so they could not catch a wrong value; the 2000 constant was also in my own validation.py", "how": "Claude review against the brief's 300; fixed in d637bce" }
+        { "what": "The generated tests named and commented the story limit as 2000 and built stories from MAX_STORY_LENGTH, so they could not catch a wrong value; the 2000 constant was also in validation.py", "how": "Claude review against the brief's 300; fixed in d637bce" }
       ]
     },
     {
@@ -69,7 +79,7 @@
       "tool": "Claude (web)",
       "model": "Claude Sonnet 5.5 (medium)",
       "date": "2026-11-18",
-      "goal": "Admin login, session cookie, dashboard, CSRF override, admin tests, secrets scan, documentation review",
+      "goal": "Admin login, session cookie, dashboard, CSRF override, admin test specs, secrets scan, documentation review",
       "log": null,
       "share_link": "[FILL: create the link when this chat is finished]",
       "commits": ["8ca160b", "1578585", "3b3d4bd", "ca7f4c5", "1c693b0", "6a4f26a", "d5a36c7", "949a0c4"],
@@ -77,38 +87,17 @@
         "app/security.py", "app/admin.py",
         "app/templates/admin_login.html", "app/templates/admin_dashboard.html"
       ],
-      "kept": "Admin router, guard, login limiter, CSRF check and override route, as drafted",
+      "kept": "Admin router, guard, login limiter, CSRF check and override route, as drafted (saved to the repo by Antigravity, S2 steps 231-448)",
       "changed": "Fresh caption required when overriding an AI rejection; strict AI_PROVIDER check in config.py; route walk in test_admin.py rewritten to read included routers",
       "rejected": ["Installing httpx2 (suggested by a Starlette deprecation warning)"],
       "mistakes_caught": [
         { "what": "Predicted that removing the CSRF check would fail tests 9 and 13/14; only test 9 can", "how": "Ran the sabotage" },
         { "what": "Spec to walk app.routes found 0 routes because FastAPI 0.163.1 stores included routers as objects without a path", "how": "The checked >= 2 assertion failed" }
       ]
-    },
-    {
-      "id": "S5",
-      "tool": "Antigravity",
-      "model": "gemini-3.8-flash-high",
-      "date": "2026-11-20",
-      "goal": "Documentation pass: test 8 upgrade, first drafts of README, AI_USAGE.md and AI_SESSIONS.json, secrets scan",
-      "log": "ai-logs/S5-antigravity.md",
-      "share_link": null,
-      "commits": ["[FILL: commit hash of the test 8 commit]"],
-      "files": ["tests/test_admin.py", "README.md", "AI_USAGE.md", "AI_SESSIONS.json"],
-      "kept": "Test 8 upgrade; structure of the documents",
-      "changed": "README, AI_USAGE.md and AI_SESSIONS.json rewritten after Claude review; reconstructed summary files removed from ai-logs/",
-      "rejected": ["Summary files written into ai-logs/ as if they were raw exports"],
-      "mistakes_caught": [
-        { "what": "README described mock triggers that do not exist and an AI_PROVIDER value (groq) that config.py rejects", "how": "Claude compared it with mock.py and config.py" },
-        { "what": "README and JSON listed ai_error codes (api_down, schema_error) that the code never writes, and said ai_decision is 'rejected' when the AI fails", "how": "Claude compared it with analyze_story()" },
-        { "what": "AI_USAGE.md labelled paraphrased text as verbatim S4 prompts and claimed test_admin.py was entirely hand-written", "how": "Claude review; I corrected the claims" }
-      ]
     }
   ],
   "written_by_hand": [
     "app/ai/parse.py",
-    "tests/test_parse.py",
-    "app/validation.py",
-    "tests/test_security.py"
+    "tests/test_parse.py"
   ]
 }

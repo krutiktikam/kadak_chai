@@ -32,7 +32,7 @@ Everything else was written or saved by an AI tool. I went through the Python fi
 
 - **`app/validation.py`:** written by Antigravity (S2, step 92) from a rule checklist I gave it, against the 69 tests Gemini generated in S3. An earlier commit message (`727dc77`) and an early draft of this file called it hand-written. That was wrong, and I found it by reading the raw Antigravity log.
 - **`tests/test_validation.py`:** generated in S3 as a specification, later edited by Antigravity (300-character limit and the test that pins it).
-- **`tests/test_security.py`:** tests/test_security.py: 14 unit tests for check_credentials, LoginLimiter, and csrf_ok, written by hand against the Phase 4 security rules.
+- **`tests/test_security.py`:** 14 unit tests for `check_credentials`, `LoginLimiter`, and `csrf_ok`, written by hand against the Phase 4 security rules.
 - **`tests/test_admin.py`:** written by Antigravity from a table of cases from S4. Test 8 was changed by Antigravity so it also sends an itsdangerous cookie made with a different key. That proves forged cookies are rejected, but it is not a byte-exact copy of Starlette's own cookie format.
 - **`app/security.py`, `app/admin.py`, admin templates:** drafted in S4 and saved by Antigravity. I ran them, tested them and explained them back in the chat.
 - **Templates and CSS:** S2. The public wall and copy were corrected after review (`d637bce`, `d5a36c7`, `949a0c4`).
