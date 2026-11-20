@@ -534,3 +534,5 @@ textarea.is-invalid {
 .admin-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
 .admin-table th, .admin-table td { text-align: left; vertical-align: top; padding: .5rem; border-bottom: 1px solid #ddd; }
 .story-cell { min-width: 14rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.filter-link { color: #231812; background: #fffdf9; border-color: #e6d9c7; }
+.filter-link.is-active { color: #fffdf9; background: #b44a1e; border-color: #b44a1e; text-decoration: none; }
