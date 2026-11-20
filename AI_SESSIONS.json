@@ -1,82 +1,114 @@
 {
-  "project": "Kadak Chai Co. (#MyChaiBreak)",
-  "tools": {
-    "S1": "Claude (Web) — Architecture planning, pair-programming guidance, initial skeletons",
-    "S2": "Antigravity (IDE Agent) — Test scaffolding, Jinja2/CSS templates, route implementation",
-    "S3": "Gemini (Web) — Live Groq debugging, orchestrator & test suite authoring, Phase 3 TDD workflow",
-    "S4": "Claude (Web) ? Phase 4 admin security, signed session cookies, CSRF override, and Phase 5 review"
-  },
+  "candidate": "Krutik Tikam",
+  "total_hours": 18,
   "sessions": [
     {
-      "id": "S1-01",
-      "tool": "S1",
-      "phase": "Phase 1 — Foundation",
-      "scope": [
-        "pyproject/requirements setup, strict .gitignore, .env.example",
-        "app/config.py (loud startup failure on missing secrets)",
-        "app/db.py, app/models.py (public_id vs internal id, ai_decision vs status)",
-        "app/main.py (/health endpoint)"
+      "id": "S1",
+      "tool": "Claude (web)",
+      "model": "Claude Sonnet 5.5 (medium)",
+      "date": "2026-11-17",
+      "goal": "Mentor session: project foundation, config, DB model, AI result schema, mock provider, parser spec, Groq client",
+      "log": null,
+      "share_link": "https://claude.ai/share/10032f3a-982c-4195-9162-5cd7eb01e9ce",
+      "commits": ["b4129a8", "28d27f5", "a48078a", "0a1a478", "6a0841a", "8811821", "272f7d3"],
+      "files": [
+        ".gitignore", ".env.example", "requirements.txt", "pytest.ini",
+        "app/config.py", "app/db.py", "app/models.py", "app/main.py",
+        "app/ai/schema.py", "app/ai/mock.py", "app/ai/client.py"
       ],
-      "human_decisions": [
-        "Enforced separation between sequential internal id and random URL-safe public_id.",
-        "Kept ai_decision separate from publication status to support manual admin overrides."
+      "kept": "Config, DB model, AI result schema and mock provider, mostly as drafted",
+      "changed": "Switched AI_MODEL to openai/gpt-oss-20b after live 404s; removed response_format after a live 400; raised max_tokens from 200 to 500 after truncated JSON; pinned dependency versions; parser was written by me against the spec and then fixed after review (from None, RecursionError handling)",
+      "rejected": [],
+      "mistakes_caught": [
+        { "what": "Parser spec let exception chains carry story text into tracebacks", "how": "Review, then a traceback assertion that failed before the fix" },
+        { "what": "Suggested Groq model names (llama-3.3-70b-versatile, llama-3.1-8b-instant) that returned 404", "how": "Live call; checked the provider's /models list" },
+        { "what": "Added response_format json_object, which returned 400 on Groq", "how": "Live call" },
+        { "what": "Set max_tokens 200, which truncated a reasoning model's JSON", "how": "Live run: the parser returned invalid_json" }
       ]
     },
     {
-      "id": "S1-S2-S3-02",
-      "tool": "S1, S2, S3",
-      "phase": "Phase 2 — AI Moderation Module",
-      "scope": [
-        "app/ai/parse.py & app/ai/mock.py (Pydantic v2 AIResult schema, deterministic mock triggers)",
-        "app/ai/client.py (OpenAI-compatible httpx client for Groq)",
-        "app/ai/__init__.py (analyze_story orchestrator with pending_review fallback)",
-        "tests/test_parse.py & tests/test_ai.py (42 unit tests)"
+      "id": "S2",
+      "tool": "Antigravity",
+      "model": "gemini-3.8-flash-high",
+      "date": "2026-11-17",
+      "goal": "Public pages: templates, CSS, submit flow, result page, route tests",
+      "log": "ai-logs/S2-antigravity.md",
+      "share_link": null,
+      "commits": ["bdb40e8"],
+      "files": [
+        "app/main.py", "app/static/style.css", "app/templates/base.html",
+        "app/templates/index.html", "app/templates/result.html", "tests/test_public_routes.py"
       ],
-      "human_decisions": [
-        "Discovered Groq 404s on deprecated Llama IDs; queried /models and switched AI_MODEL to openai/gpt-oss-20b.",
-        "Removed response_format: json_object after hitting http_400 on Groq, relying on SYSTEM_PROMPT + parse_ai_response.",
-        "Diagnosed JSON truncation caused by openai/gpt-oss-20b internal reasoning tokens (~166 tokens) and raised max_tokens from 200 to 500.",
-        "Enforced short error codes with `raise ... from None` so API keys, response bodies, and user stories never leak into logs or tracebacks."
+      "kept": "Template structure, CSS palette, 303 redirect after submit, seven route tests",
+      "changed": "Public wall reduced to first name and caption only; character limit changed from 2000 to 300; false and invented marketing copy replaced",
+      "rejected": [],
+      "mistakes_caught": [
+        { "what": "My prompt asked for a 0 / 2000 counter and for story and city on the public wall; the brief says 300 characters and my privacy rule says first name and caption only", "how": "Claude review against the brief, fixed in d637bce" },
+        { "what": "index.html said every entry is reviewed before publication and promised limited-edition tea tins", "how": "Claude review, fixed in d5a36c7 and 949a0c4" }
       ]
     },
     {
-      "id": "S2-S3-03",
-      "tool": "S2, S3",
-      "phase": "Phase 3 — Validation & Public Submission Flow",
-      "scope": [
-        "tests/test_validation.py (69 unit tests generated first as a TDD spec)",
-        "app/main.py (GET /, POST /submit with 303 PRG, GET /result/{public_id})",
-        "app/templates/{base,index,result}.html & app/static/style.css",
-        "tests/test_public_routes.py (7 end-to-end route & XSS tests)"
-      ],
-      "human_decisions": [
-        "Hand-wrote the entire core validation and contact normalisation logic in app/validation.py against the 69-test TDD suite.",
-        "Verified live end-to-end submission flow in browser and Swagger /docs, confirming random public_id URLs, contact privacy, and XSS escaping."
+      "id": "S3",
+      "tool": "Gemini (web)",
+      "model": "Hydrogen (medium)",
+      "date": "2026-11-17",
+      "goal": "analyze_story orchestrator and a 69-test specification for validation",
+      "log": null,
+      "share_link": "https://share.gemini.google/0GayTQRjP05b",
+      "commits": ["823100c", "727dc77", "c135a4a", "d637bce"],
+      "files": ["app/ai/__init__.py", "tests/test_ai.py", "tests/test_validation.py"],
+      "kept": "analyze_story with the pending_review fallback; the validation tests as a specification",
+      "changed": "Implemented app/validation.py by hand against the 69 tests; story limit changed to 300 in d637bce",
+      "rejected": [],
+      "mistakes_caught": [
+        { "what": "The generated tests named and commented the story limit as 2000 and built stories from MAX_STORY_LENGTH, so they could not catch a wrong value; the 2000 constant was also in my own validation.py", "how": "Claude review against the brief's 300; fixed in d637bce" }
       ]
     },
     {
-      "id": "S4-04",
-      "tool": "S4",
-      "phase": "Phase 4 ? Admin Dashboard, Auth & CSRF Override",
-      "commits": [
-        "8ca160b",
-        "1578585",
-        "3b3d4bd",
-        "ca7f4c5",
-        "1c693b0",
-        "6a4f26a"
+      "id": "S4",
+      "tool": "Claude (web)",
+      "model": "Claude Sonnet 5.5 (medium)",
+      "date": "2026-11-18",
+      "goal": "Admin login, session cookie, dashboard, CSRF override, admin tests, secrets scan, documentation review",
+      "log": null,
+      "share_link": "[FILL: create the link when this chat is finished]",
+      "commits": ["8ca160b", "1578585", "3b3d4bd", "ca7f4c5", "1c693b0", "6a4f26a", "d5a36c7", "949a0c4"],
+      "files": [
+        "app/security.py", "app/admin.py",
+        "app/templates/admin_login.html", "app/templates/admin_dashboard.html"
       ],
-      "scope": [
-        "app/security.py (constant-time check_credentials, LoginLimiter, csrf_ok)",
-        "app/admin.py (signed HttpOnly SameSite=Lax session cookies, require_admin guard, status filter, CSRF-protected override)",
-        "app/templates/{admin_login,admin_dashboard}.html & app/static/style.css",
-        "tests/test_security.py (14 unit tests) & tests/test_admin.py (17 integration & access-control tests)"
-      ],
-      "human_decisions": [
-        "Hand-wrote all 14 unit tests in tests/test_security.py and all 17 route/security tests in tests/test_admin.py.",
-        "Required admins to enter a fresh 1-12 word caption when overriding an AI-rejected entry to approved so AI rejection captions never publish to the wall.",
-        "Verified CSRF enforcement via deliberate sabotage run and tightened AI_PROVIDER validation in app/config.py."
+      "kept": "Admin router, guard, login limiter, CSRF check and override route, as drafted",
+      "changed": "Fresh caption required when overriding an AI rejection; strict AI_PROVIDER check in config.py; route walk in test_admin.py rewritten to read included routers",
+      "rejected": ["Installing httpx2 (suggested by a Starlette deprecation warning)"],
+      "mistakes_caught": [
+        { "what": "Predicted that removing the CSRF check would fail tests 9 and 13/14; only test 9 can", "how": "Ran the sabotage" },
+        { "what": "Spec to walk app.routes found 0 routes because FastAPI 0.163.1 stores included routers as objects without a path", "how": "The checked >= 2 assertion failed" }
+      ]
+    },
+    {
+      "id": "S5",
+      "tool": "Antigravity",
+      "model": "gemini-3.8-flash-high",
+      "date": "2026-11-20",
+      "goal": "Documentation pass: test 8 upgrade, first drafts of README, AI_USAGE.md and AI_SESSIONS.json, secrets scan",
+      "log": "ai-logs/S5-antigravity.md",
+      "share_link": null,
+      "commits": ["[FILL: commit hash of the test 8 commit]"],
+      "files": ["tests/test_admin.py", "README.md", "AI_USAGE.md", "AI_SESSIONS.json"],
+      "kept": "Test 8 upgrade; structure of the documents",
+      "changed": "README, AI_USAGE.md and AI_SESSIONS.json rewritten after Claude review; reconstructed summary files removed from ai-logs/",
+      "rejected": ["Summary files written into ai-logs/ as if they were raw exports"],
+      "mistakes_caught": [
+        { "what": "README described mock triggers that do not exist and an AI_PROVIDER value (groq) that config.py rejects", "how": "Claude compared it with mock.py and config.py" },
+        { "what": "README and JSON listed ai_error codes (api_down, schema_error) that the code never writes, and said ai_decision is 'rejected' when the AI fails", "how": "Claude compared it with analyze_story()" },
+        { "what": "AI_USAGE.md labelled paraphrased text as verbatim S4 prompts and claimed test_admin.py was entirely hand-written", "how": "Claude review; I corrected the claims" }
       ]
     }
+  ],
+  "written_by_hand": [
+    "app/ai/parse.py",
+    "tests/test_parse.py",
+    "app/validation.py",
+    "tests/test_security.py"
   ]
 }
