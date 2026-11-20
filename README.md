@@ -64,6 +64,16 @@ pytest -q
 | `DATABASE_URL` | no | Default `sqlite:///./kadak.db`. A `postgres://` or `postgresql://` URL is converted for the psycopg 3 driver. |
 | `COOKIE_SECURE` | no | Set `true` when served over HTTPS. |
 
+## Live deployment
+
+- Hosted on Render (free web service) with a Neon Postgres database. Tables are created at startup.
+- The live site runs in **mock AI mode** (`AI_PROVIDER=mock`), so no API key is stored on the public site. Real AI mode was tested locally only.
+- Build command: `pip install -r requirements.txt`. Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`. Health check path: `/health`.
+- `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `SECRET_KEY`, `DATABASE_URL`, `COOKIE_SECURE=true`, `AI_PROVIDER=mock` and `PYTHON_VERSION` are set in Render's dashboard, not in the repo. Admin credentials are not in the repo either.
+- **Cold start:** the free instance sleeps after a period of inactivity, so the first request afterwards can take around a minute. Later requests are fast.
+**Live site:** https://kadak-chai-roit.onrender.com/ (mock AI mode)
+**Time spent:** roughly 18 hours.
+
 ## Mock mode
 
 Mock mode returns raw JSON text, so it goes through the same parser and schema as real AI output. It is deterministic. Rules are checked in this order:
@@ -110,11 +120,11 @@ When the AI step fails, `ai_decision` stays empty and `ai_error` holds one short
 ## Known limits / not finished
 
 - **Prompt injection is reduced, not eliminated.** A cleverly worded story could get a bad but well-formed caption approved. The 12-word cap, HTML escaping and the admin override limit the damage.
-- **Login limiter is in memory.** It resets on restart and is not shared across workers. Behind a proxy, `request.client.host` may be the proxy's address unless the server is configured to trust forwarded headers.
+- **Login limiter is in memory and shared.** It resets on restart or redeploy and is not shared across workers. The app does not trust forwarded headers, so on Render every visitor appears to come from the proxy's address and the limiter acts as one shared bucket: five failed logins from anyone block all logins for 15 minutes.
 - **Logout cannot revoke a copied cookie.** The session is stateless and stays valid until it expires.
 - **No rate limit on `/submit` and no duplicate-contact blocking yet.**
 - **Not built:** CSV export, category filter in admin, Open Graph tags, Hindi toggle, Docker.
-- **Deployment:** not deployed yet.
+- **Deployment:** live on Render (free tier) with Neon Postgres, in mock AI mode. Real AI was tested locally only.
 - **Tests:** 149 tests covering parsing, validation, the AI fallback, public privacy, XSS escaping, login, CSRF and overrides. No browser-level tests.
 
 ## Project layout
