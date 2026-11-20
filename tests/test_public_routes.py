@@ -336,3 +336,25 @@ def test_xss_protection_escapes_user_input(client):
     assert home_resp.status_code == 200
     assert "<script>alert('xss')</script>" not in home_resp.text
     assert "&lt;script&gt;" in home_resp.text
+
+
+def test_no_mojibake_in_public_pages(client):
+    """Submits an approved story in mock mode and asserts '\\u00e2\\u20ac' is not in GET / or GET /result/{public_id}."""
+    payload = {
+        "name": "Pooja Sharma",
+        "city": "Jaipur",
+        "contact": "pooja@example.com",
+        "story": "Chai with my grandma after school every afternoon.",
+        "consent": "yes",
+    }
+    response = client.post("/submit", data=payload, follow_redirects=False)
+    assert response.status_code == 303
+    location = response.headers["location"]
+
+    result_resp = client.get(location)
+    assert result_resp.status_code == 200
+    assert "\u00e2\u20ac" not in result_resp.text
+
+    home_resp = client.get("/")
+    assert home_resp.status_code == 200
+    assert "\u00e2\u20ac" not in home_resp.text

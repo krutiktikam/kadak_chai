@@ -1,6 +1,6 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 
-{% block title %}Kadak Chai Co. â€” Share Your #MyChaiBreak Story{% endblock %}
+{% block title %}Kadak Chai Co. &mdash; Share Your #MyChaiBreak Story{% endblock %}
 
 {% block content %}
 <section class="hero-section">
@@ -121,11 +121,11 @@
         <article class="story-card">
           <div>
             {% if entry.ai_caption %}
-              <h4 class="story-caption">â€œ{{ entry.ai_caption }}â€</h4>
+              <h4 class="story-caption">&ldquo;{{ entry.ai_caption }}&rdquo;</h4>
             {% endif %}
           </div>
           <div class="story-meta">
-            <span class="story-author">â€” {{ entry.name.split()[0] }}</span>
+            <span class="story-author">&mdash; {{ entry.name.split()[0] }}</span>
             {% if entry.ai_category %}
               <span class="badge badge-category">{{ entry.ai_category }}</span>
             {% endif %}
