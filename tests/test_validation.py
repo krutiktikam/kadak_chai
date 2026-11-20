@@ -239,6 +239,10 @@ def test_validate_submission_invalid_story(invalid_story: str):
     assert "story" in exc_info.value.errors
 
 
+def test_story_limit_is_300_characters_per_the_brief():
+    assert MAX_STORY_LENGTH == 300
+
+
 # ==============================================================================
 # 6. Missing / False Consent
 # ==============================================================================
