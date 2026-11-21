@@ -8,11 +8,11 @@ I built this project with AI help. This file says which tool did what, shows pro
 |---|---|---|---|
 | S0 | Claude (web) | Claude Sonnet 5.5 (medium) | planning chat: stack choice and the opening prompt. The chat holds personal material, so ai-logs/S0-claude-planning.md has the two project replies with one section removed. |
 | S1 | Claude (web) | Claude Sonnet 5.5 (medium) | Mentor: foundation, config, DB model, AI schema, mock provider, parser spec, Groq client |
-| S2 | Antigravity | gemini-3.8-flash-high | One thread, 17-20 Nov: saved and ran code from the Claude chats, wrote `validation.py`, templates, CSS, route and admin tests, first drafts of the documents |
+| S2 | Antigravity | gemini-3.8-flash-high | One thread, 17-21 Nov: saved and ran code from the Claude chats, wrote `validation.py`, templates, CSS, route and admin tests, first drafts of the documents |
 | S3 | Gemini (web) | Hydrogen (medium) | `analyze_story` orchestrator, 69-test validation specification |
 | S4 | Claude (web) | Claude Sonnet 5.5 (medium) | Admin login, session cookie, CSRF override, admin test specs, review of everything |
 
-**Logs.** S1, S3 and S4 are web chats, so `AI_SESSIONS.json` holds their share links. `ai-logs/S2-antigravity.jsonl` is the raw Antigravity transcript, copied from the tool's own history (one continuous thread, 667 steps). I replaced one Groq API key in it with `[REDACTED]` and changed nothing else. The steps are:
+**Logs.** S1, S3 and S4 are web chats, so `AI_SESSIONS.json` holds their share links. `ai-logs/S2-antigravity.jsonl` is the raw Antigravity transcript, copied from the tool's own history (one continuous thread, 1007 steps). I replaced API keys and my own .env values with `[REDACTED]` and changed nothing else. The steps are:
 
 | Steps | Date (UTC) | What happened |
 |---|---|---|
@@ -21,6 +21,7 @@ I built this project with AI help. This file says which tool did what, shows pro
 | 231-448 | 18 Nov | Saved the admin code from S4, wrote admin tests |
 | 449-559 | 19 Nov | First drafts of the documents, test 8 upgrade |
 | 560-667 | 20 Nov | The 300-character test and the log extraction |
+| 668-1007 | 20-21 Nov | Frontend polish (landing, result page, admin cards), the S0 log and documentation updates |
 
 ## What I wrote by hand
 
