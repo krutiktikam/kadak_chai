@@ -4,9 +4,19 @@
   {% if entry.status == 'approved' %}
     Approved: #MyChaiBreak Story by {{ entry.name.split()[0] }}
   {% elif entry.status == 'rejected' %}
-    Story Submission Update — Kadak Chai Co.
+    Story Submission Update &mdash; Kadak Chai Co.
   {% else %}
-    Story In Review — Kadak Chai Co.
+    Story In Review &mdash; Kadak Chai Co.
+  {% endif %}
+{% endblock %}
+
+{% block head %}
+  {% if entry.status == 'approved' %}
+    <meta property="og:title" content="Kadak Chai Co. &mdash; #MyChaiBreak">
+    <meta property="og:description" content="{{ entry.ai_caption }}">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
   {% endif %}
 {% endblock %}
 
@@ -33,13 +43,16 @@
       <strong>Congratulations, {{ entry.name.split()[0] }}!</strong> Your chai story has been accepted and is now featured on the public #MyChaiBreak wall.
     </div>
 
-    {% if entry.ai_caption %}
-      <h3 class="result-caption">“{{ entry.ai_caption }}”</h3>
-    {% endif %}
-
-    <div class="story-meta" style="margin-bottom: 1.5rem;">
-      <span class="story-author">— {{ entry.name.split()[0] }}</span>
-      <span class="story-date">{{ entry.created_at.strftime('%B %d, %Y') if entry.created_at else '' }}</span>
+    <div class="poster-card">
+      {% if entry.ai_caption %}
+        <blockquote class="poster-caption">&ldquo;{{ entry.ai_caption }}&rdquo;</blockquote>
+      {% endif %}
+      <div class="poster-meta">
+        <span class="poster-author">&mdash; {{ entry.name.split()[0] }}</span>
+        {% if entry.created_at %}
+          <span class="poster-date">{{ entry.created_at.strftime('%B %d, %Y') }}</span>
+        {% endif %}
+      </div>
     </div>
 
   {% elif entry.status == 'rejected' %}
@@ -66,14 +79,52 @@
     <p style="margin: 0 0 0.5rem; color: var(--chai-light); font-size: 0.85rem;">
       You can return to this page anytime to view your story status.
     </p>
-    <input type="text" readonly value="{{ request.url }}" class="share-link-input" onclick="this.select();">
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem;">
+      <input type="text" readonly value="{{ request.url }}" id="share-url-input" class="share-link-input" style="flex: 1 1 200px;" onclick="this.select();">
+      <button type="button" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;" onclick="copyShareLink()">Copy link</button>
+    </div>
+    <span id="copy-status" style="font-size: 0.85rem; color: var(--terracotta); font-weight: 600;" aria-live="polite"></span>
   </div>
 
   <div class="result-actions">
-    <a href="/" class="btn btn-secondary">← Back to Stories Wall</a>
-    {% if entry.status == 'rejected' or entry.status == 'pending_review' %}
+    <a href="/" class="btn btn-secondary">&larr; Back to Stories Wall</a>
+    {% if entry.status == 'approved' %}
+      <a href="https://wa.me/?text=My%20%23MyChaiBreak%20story%3A%20{{ request.url }}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">Share on WhatsApp</a>
+      <a href="/" class="btn btn-primary">Share another story</a>
+    {% elif entry.status == 'rejected' or entry.status == 'pending_review' %}
       <a href="/#submit-section" class="btn btn-primary">Submit Another Story</a>
     {% endif %}
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function copyShareLink() {
+    var input = document.getElementById("share-url-input");
+    var status = document.getElementById("copy-status");
+    var url = input ? input.value : window.location.href;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function() {
+        if (status) status.textContent = "Copied!";
+      }).catch(function() {
+        fallbackCopy();
+      });
+    } else {
+      fallbackCopy();
+    }
+    function fallbackCopy() {
+      if (input) {
+        input.select();
+        input.setSelectionRange(0, 99999);
+        try {
+          document.execCommand("copy");
+          if (status) status.textContent = "Copied!";
+        } catch (err) {
+          if (status) status.textContent = "Link selected";
+        }
+      }
+    }
+  }
+</script>
 {% endblock %}

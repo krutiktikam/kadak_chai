@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}Kadak Chai Co. — #MyChaiBreak{% endblock %}</title>
+  <title>{% block title %}Kadak Chai Co. &mdash; #MyChaiBreak{% endblock %}</title>
+  {% block head %}{% endblock %}
   <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
@@ -14,13 +15,14 @@
     </div>
   </header>
 
-  <main class="container">
+  <main class="container {% block main_class %}{% endblock %}">
     {% block content %}{% endblock %}
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <p>© Kadak Chai Co. • Celebrating the everyday rituals of tea, warmth, and conversation.</p>
+      <p>&copy; Kadak Chai Co. &bull; Celebrating the everyday rituals of tea, warmth, and conversation.</p>
+      <p class="footer-disclaimer">Kadak Chai Co. is a fictional brand created for a hiring assignment.</p>
     </div>
   </footer>
 

@@ -358,3 +358,51 @@ def test_no_mojibake_in_public_pages(client):
     home_resp = client.get("/")
     assert home_resp.status_code == 200
     assert "\u00e2\u20ac" not in home_resp.text
+
+
+def test_result_page_open_graph_tags_for_approved_and_pending(client, test_db):
+    """Approved result page has og:description with caption; pending result page has no og:description."""
+    with test_db() as session:
+        approved = Entry(
+            name="Kavita Rao",
+            city="Bengaluru",
+            contact="kavita@example.com",
+            contact_type="email",
+            story="Filter coffee was regular, but masala chai during monsoon was pure magic.",
+            consent=True,
+            consent_at=utcnow(),
+            status="approved",
+            ai_caption="Monsoon masala chai brings pure everyday magic.",
+            ai_category="nostalgic",
+        )
+        pending = Entry(
+            name="Devendra Joshi",
+            city="Ahmedabad",
+            contact="+919876543211",
+            contact_type="phone",
+            story="Evening chai with snacks after work at the old corner shop.",
+            consent=True,
+            consent_at=utcnow(),
+            status="pending_review",
+        )
+        session.add_all([approved, pending])
+        session.commit()
+        approved_id = approved.public_id
+        pending_id = pending.public_id
+
+    # Approved entry result page
+    resp_app = client.get(f"/result/{approved_id}")
+    assert resp_app.status_code == 200
+    assert '<meta property="og:description" content="Monsoon masala chai brings pure everyday magic.">' in resp_app.text
+    assert '<meta property="og:title"' in resp_app.text
+    assert '<meta property="og:url"' in resp_app.text
+    assert '<meta property="og:type" content="website">' in resp_app.text
+    assert '<meta name="twitter:card" content="summary">' in resp_app.text
+    assert "og:image" not in resp_app.text
+
+    # Pending entry result page
+    resp_pen = client.get(f"/result/{pending_id}")
+    assert resp_pen.status_code == 200
+    assert "og:description" not in resp_pen.text
+    assert "og:title" not in resp_pen.text
+

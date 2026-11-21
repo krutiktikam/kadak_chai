@@ -1,4 +1,4 @@
-/* Kadak Chai Co. — #MyChaiBreak Editorial Styling */
+/* Kadak Chai Co. -- #MyChaiBreak Editorial Styling */
 
 :root {
   --bg-parchment: #fbf8f4;
@@ -536,3 +536,281 @@ textarea.is-invalid {
 .story-cell { min-width: 14rem; white-space: pre-wrap; overflow-wrap: anywhere; }
 .filter-link { color: #231812; background: #fffdf9; border-color: #e6d9c7; }
 .filter-link.is-active { color: #fffdf9; background: #b44a1e; border-color: #b44a1e; text-decoration: none; }
+
+/* Hero illustration and Steps strip */
+.hero-art, .steps {
+  --art-paper: #fffdf9;
+  --art-ink: #231812;
+  --art-accent: #b44a1e;
+  --art-border: #e6d9c7;
+}
+
+.hero-art { display: flex; justify-content: center; margin: 1rem 0; }
+
+.art-saucer { fill: var(--art-border); stroke: var(--art-ink); stroke-width: 1.5; }
+.art-cup    { fill: var(--art-accent); stroke: var(--art-ink); stroke-width: 1.5; stroke-linejoin: round; }
+.art-rim    { fill: var(--art-paper); stroke: var(--art-ink); stroke-width: 1.5; }
+.art-tea    { fill: #7a3a18; }
+.art-leaf   { fill: var(--art-border); stroke: var(--art-ink); stroke-width: 1.5; }
+.art-line   { fill: none; stroke: var(--art-ink); stroke-width: 1.5; stroke-linecap: round; }
+
+.steam {
+  fill: none;
+  stroke: var(--art-accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  opacity: 0;
+  animation: steam-rise 4s ease-in-out infinite;
+}
+.steam.s2 { animation-delay: 1.2s; }
+.steam.s3 { animation-delay: 2.4s; }
+
+@keyframes steam-rise {
+  0%   { opacity: 0;   transform: translateY(8px); }
+  40%  { opacity: .7; }
+  100% { opacity: 0;   transform: translateY(-12px); }
+}
+
+.steps {
+  display: grid;
+  gap: .75rem;
+  grid-template-columns: 1fr;
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .75rem 1rem;
+  background: var(--art-paper);
+  border: 1px solid var(--art-border);
+  border-radius: 12px;
+  color: var(--art-ink);
+}
+.steps svg { color: var(--art-accent); flex-shrink: 0; }
+
+@media (min-width: 640px) {
+  .steps { grid-template-columns: repeat(3, 1fr); }
+}
+
+.story-card { transition: transform .2s ease, box-shadow .2s ease; }
+.story-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(35, 24, 18, .12); }
+
+@media (prefers-reduced-motion: reduce) {
+  .steam { animation: none; opacity: .5; }
+  .story-card { transition: none; }
+  .story-card:hover { transform: none; }
+}
+
+/* Accessibility and Interaction enhancements */
+:focus-visible {
+  outline: 2px solid #b44a1e;
+  outline-offset: 2px;
+}
+
+/* Story wall responsive grid: 1 col on mobile, 2 on tablet, 3 on desktop */
+.stories-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 640px) {
+  .stories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 960px) {
+  .stories-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* 44px tap target for consent checkbox */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 44px;
+  padding: 0.35rem 0;
+  cursor: pointer;
+}
+
+/* Result Poster Card */
+.poster-card {
+  background: #fffdf9;
+  border: 2px solid #e6d9c7;
+  border-radius: 12px;
+  padding: 2.25rem 1.75rem;
+  margin: 1.5rem 0 2rem;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(35, 24, 18, 0.08);
+}
+.poster-caption {
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 1.85rem;
+  font-style: italic;
+  font-weight: 700;
+  color: #231812;
+  margin: 0 0 1.25rem;
+  line-height: 1.35;
+}
+.poster-meta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.95rem;
+  color: #7a5843;
+}
+.poster-author {
+  font-weight: 600;
+  color: #231812;
+}
+
+/* Admin Responsive Cards & Container */
+.container.admin-container {
+  max-width: 1200px;
+}
+.admin-cards-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+.admin-entry-card {
+  background: #fffdf9;
+  border: 1px solid #e6d9c7;
+  border-radius: 10px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.admin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e6d9c7;
+}
+.admin-entry-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.admin-entry-id {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #231812;
+}
+.admin-entry-time {
+  font-size: 0.85rem;
+  color: #7a5843;
+}
+.admin-entry-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.overridden-tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #b44a1e;
+  font-weight: 600;
+}
+.admin-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.admin-field-group {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+}
+.admin-person strong {
+  color: #231812;
+}
+.admin-city {
+  color: #7a5843;
+  font-size: 0.9rem;
+}
+.admin-contact code {
+  background: #f4eee6;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+.admin-contact-type {
+  color: #7a5843;
+  font-size: 0.85rem;
+}
+.admin-story-text {
+  background: #fbf7f0;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #e8ded4;
+  margin-top: 0.35rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.admin-ai-result {
+  font-size: 0.9rem;
+}
+.admin-ai-details {
+  margin-top: 0.25rem;
+}
+.admin-ai-caption {
+  margin: 0.4rem 0;
+  font-style: italic;
+  font-weight: 600;
+  color: #231812;
+}
+.admin-ai-reason {
+  margin: 0.25rem 0 0;
+  color: #7a5843;
+}
+.admin-ai-failed {
+  color: #8c2424;
+  margin-top: 0.25rem;
+}
+.admin-card-actions {
+  padding-top: 0.75rem;
+  border-top: 1px solid #e6d9c7;
+}
+.admin-override-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+.override-caption-group {
+  flex: 1 1 220px;
+}
+.override-caption-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+}
+.override-buttons-group {
+  display: flex;
+  gap: 0.5rem;
+}
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+.footer-disclaimer {
+  margin-top: 0.5rem;
+  font-size: 0.825rem;
+  color: #7a5843;
+}

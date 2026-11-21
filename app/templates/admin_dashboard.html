@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% block title %}Admin — Kadak Chai Co.{% endblock %}
+{% block title %}Admin &mdash; Kadak Chai Co.{% endblock %}
+{% block main_class %}admin-container{% endblock %}
 {% block content %}
 <section class="card">
   <div class="admin-bar">
@@ -21,52 +22,81 @@
     {% if counts[current] > limit %}
       <p><small>Showing the newest {{ limit }} of {{ counts[current] }}.</small></p>
     {% endif %}
-    <div class="table-wrap">
-      <table class="admin-table">
-        <thead>
-          <tr><th>#</th><th>Submitted (UTC)</th><th>Name / city</th><th>Contact</th>
-              <th>Story</th><th>AI said</th><th>Status</th><th>Action</th></tr>
-        </thead>
-        <tbody>
-        {% for e in entries %}
-          <tr>
-            <td>{{ e.id }}</td>
-            <td>{{ e.created_at.strftime('%d %b %Y %H:%M') }}</td>
-            <td>{{ e.name }}<br><small>{{ e.city }}</small></td>
-            <td>{{ e.contact }}<br><small>{{ e.contact_type }}</small></td>
-            <td class="story-cell">{{ e.story }}</td>
-            <td>
-              {% if e.ai_decision %}
-                {{ e.ai_decision }} / {{ e.ai_category }}<br>
-                “{{ e.ai_caption }}”
-                {% if e.ai_reason %}<br><small>Reason: {{ e.ai_reason }}</small>{% endif %}
-              {% else %}
-                <small>AI failed: {{ e.ai_error or 'unknown' }}</small>
-              {% endif %}
-            </td>
-            <td>
+    <div class="admin-cards-grid">
+      {% for e in entries %}
+        <article class="admin-entry-card" id="entry-{{ e.id }}">
+          <div class="admin-card-header">
+            <div class="admin-entry-title">
+              <span class="admin-entry-id">#{{ e.id }}</span>
+              <time class="admin-entry-time">{{ e.created_at.strftime('%d %b %Y %H:%M') }} UTC</time>
+            </div>
+            <div class="admin-entry-status">
               <span class="badge {% if e.status == 'approved' %}badge-approved{% elif e.status == 'rejected' %}badge-rejected{% else %}badge-pending{% endif %}">{{ e.status }}</span>
-              {% if e.admin_override %}<br><small>overridden</small>{% endif %}
-            </td>
-            <td>
-              <form action="/admin/entries/{{ e.id }}/override" method="POST">
-                <input type="hidden" name="csrf_token" value="{{ csrf }}">
-                <input type="hidden" name="back" value="{{ current }}">
-                {% if not e.ai_caption or e.ai_decision == 'rejected' %}
-                  <input type="text" name="caption" maxlength="300" placeholder="Caption (needed to approve)">
-                {% endif %}
+              {% if e.admin_override %}
+                <span class="overridden-tag">overridden</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="admin-card-body">
+            <div class="admin-field-group">
+              <div class="admin-person">
+                <strong>{{ e.name }}</strong>
+                <span class="admin-city">({{ e.city }})</span>
+              </div>
+              <div class="admin-contact">
+                <code>{{ e.contact }}</code>
+                <span class="admin-contact-type">({{ e.contact_type }})</span>
+              </div>
+            </div>
+
+            <div class="admin-story">
+              <strong>Story:</strong>
+              <div class="admin-story-text">{{ e.story }}</div>
+            </div>
+
+            <div class="admin-ai-result">
+              <strong>AI Result:</strong>
+              {% if e.ai_decision %}
+                <div class="admin-ai-details">
+                  <span class="admin-ai-badge">{{ e.ai_decision }}</span> /
+                  <span class="admin-ai-category">{{ e.ai_category }}</span>
+                  {% if e.ai_caption %}
+                    <blockquote class="admin-ai-caption">&ldquo;{{ e.ai_caption }}&rdquo;</blockquote>
+                  {% endif %}
+                  {% if e.ai_reason %}
+                    <p class="admin-ai-reason"><small>Reason: {{ e.ai_reason }}</small></p>
+                  {% endif %}
+                </div>
+              {% else %}
+                <div class="admin-ai-failed">
+                  <small>AI failed: {{ e.ai_error or 'unknown' }}</small>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="admin-card-actions">
+            <form action="/admin/entries/{{ e.id }}/override" method="POST" class="admin-override-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf }}">
+              <input type="hidden" name="back" value="{{ current }}">
+              {% if not e.ai_caption or e.ai_decision == 'rejected' %}
+                <div class="override-caption-group">
+                  <input type="text" name="caption" maxlength="300" placeholder="Caption (needed to approve)" class="override-caption-input">
+                </div>
+              {% endif %}
+              <div class="override-buttons-group">
                 {% if e.status != 'approved' %}
-                  <button type="submit" name="decision" value="approved" class="btn btn-primary">Approve</button>
+                  <button type="submit" name="decision" value="approved" class="btn btn-primary btn-sm">Approve</button>
                 {% endif %}
                 {% if e.status != 'rejected' %}
-                  <button type="submit" name="decision" value="rejected" class="btn btn-secondary">Reject</button>
+                  <button type="submit" name="decision" value="rejected" class="btn btn-secondary btn-sm">Reject</button>
                 {% endif %}
-              </form>
-            </td>
-          </tr>
-        {% endfor %}
-        </tbody>
-      </table>
+              </div>
+            </form>
+          </div>
+        </article>
+      {% endfor %}
     </div>
   {% else %}
     <p>No entries here.</p>
