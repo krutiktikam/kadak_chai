@@ -72,8 +72,6 @@ pytest -q
 - `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `SECRET_KEY`, `DATABASE_URL`, `COOKIE_SECURE=true`, `AI_PROVIDER=mock` and `PYTHON_VERSION` are set in Render's dashboard, not in the repo. Admin credentials are not in the repo either.
 - **Cold start:** the free instance sleeps after a period of inactivity, so the first request afterwards can take around a minute. Later requests are fast.
 **Live site:** https://kadak-chai-roit.onrender.com/ (mock AI mode)
-**Time spent:** roughly 18 hours.
-
 ## Mock mode
 
 Mock mode returns raw JSON text, so it goes through the same parser and schema as real AI output. It is deterministic. Rules are checked in this order:
@@ -123,9 +121,9 @@ When the AI step fails, `ai_decision` stays empty and `ai_error` holds one short
 - **Login limiter is in memory and shared.** It resets on restart or redeploy and is not shared across workers. The app does not trust forwarded headers, so on Render every visitor appears to come from the proxy's address and the limiter acts as one shared bucket: five failed logins from anyone block all logins for 15 minutes.
 - **Logout cannot revoke a copied cookie.** The session is stateless and stays valid until it expires.
 - **No rate limit on `/submit` and no duplicate-contact blocking yet.**
-- **Not built:** CSV export, category filter in admin, Open Graph tags, Hindi toggle, Docker.
+- **Not built:** CSV export, category filter in admin, Open Graph image (text tags exist on approved result pages), Hindi toggle, Docker.
 - **Deployment:** live on Render (free tier) with Neon Postgres, in mock AI mode. Real AI was tested locally only.
-- **Tests:** 149 tests covering parsing, validation, the AI fallback, public privacy, XSS escaping, login, CSRF and overrides. No browser-level tests.
+- **Tests:** 152 tests covering parsing, validation, the AI fallback, public privacy, XSS escaping, login, CSRF and overrides. No browser-level tests.
 
 ## Project layout
 
@@ -149,7 +147,7 @@ app/
 tests/             pytest suite
 AI_USAGE.md        how AI was used, with mistakes caught
 AI_SESSIONS.json   index of AI sessions
-ai-logs/           raw Antigravity transcript (S2, one secret redacted); web chats are linked in AI_SESSIONS.json
+ai-logs/           raw Antigravity transcript (S2, secrets redacted); web chats are linked in AI_SESSIONS.json
 ```
 
 ## AI usage
