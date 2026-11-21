@@ -6,6 +6,7 @@ I built this project with AI help. This file says which tool did what, shows pro
 
 | Session | Tool | Model shown in the tool | Used for |
 |---|---|---|---|
+| S0 | Claude (web) | Claude Sonnet 5.5 (medium) | planning chat: stack choice and the opening prompt. The chat holds personal material, so ai-logs/S0-claude-planning.md has the two project replies with one section removed. |
 | S1 | Claude (web) | Claude Sonnet 5.5 (medium) | Mentor: foundation, config, DB model, AI schema, mock provider, parser spec, Groq client |
 | S2 | Antigravity | gemini-3.8-flash-high | One thread, 17-20 Nov: saved and ran code from the Claude chats, wrote `validation.py`, templates, CSS, route and admin tests, first drafts of the documents |
 | S3 | Gemini (web) | Hydrogen (medium) | `analyze_story` orchestrator, 69-test validation specification |
@@ -32,7 +33,7 @@ Everything else was written or saved by an AI tool. I went through the Python fi
 
 - **`app/validation.py`:** written by Antigravity (S2, step 92) from a rule checklist I gave it, against the 69 tests Gemini generated in S3. An earlier commit message (`727dc77`) and an early draft of this file called it hand-written. That was wrong, and I found it by reading the raw Antigravity log.
 - **`tests/test_validation.py`:** generated in S3 as a specification, later edited by Antigravity (300-character limit and the test that pins it).
-- **`tests/test_security.py`:** 14 unit tests for `check_credentials`, `LoginLimiter`, and `csrf_ok`, written by hand against the Phase 4 security rules.
+- **`tests/test_security.py`:** I wrote the first test by hand. Antigravity wrote the remaining tests from my specs, including the CSRF tests.
 - **`tests/test_admin.py`:** written by Antigravity from a table of cases from S4. Test 8 was changed by Antigravity so it also sends an itsdangerous cookie made with a different key. That proves forged cookies are rejected, but it is not a byte-exact copy of Starlette's own cookie format.
 - **`app/security.py`, `app/admin.py`, admin templates:** drafted in S4 and saved by Antigravity. I ran them, tested them and explained them back in the chat.
 - **Templates and CSS:** S2. The public wall and copy were corrected after review (`d637bce`, `d5a36c7`, `949a0c4`).

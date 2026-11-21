@@ -147,7 +147,7 @@ app/
 tests/             pytest suite
 AI_USAGE.md        how AI was used, with mistakes caught
 AI_SESSIONS.json   index of AI sessions
-ai-logs/           raw Antigravity transcript (S2, secrets redacted); web chats are linked in AI_SESSIONS.json
+ai-logs/           selected excerpt for S0 (Claude planning); raw Antigravity transcript for S2 (secrets redacted); web chats are linked in AI_SESSIONS.json
 ```
 
 ## AI usage

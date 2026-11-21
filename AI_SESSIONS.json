@@ -3,6 +3,21 @@
   "total_hours": 18,
   "sessions": [
     {
+      "id": "S0",
+      "tool": "Claude (web)",
+      "model": "Claude Sonnet 5.5 (medium)",
+      "date": "2026-11-17",
+      "goal": "Planning only: read the brief, choose the stack, timeline, and the opening prompt for the build chat",
+      "log": "ai-logs/S0-claude-planning.md",
+      "share_link": null,
+      "commits": [],
+      "files": [],
+      "kept": "Stack choice C (FastAPI + Jinja2) and the build-chat prompt, used as written",
+      "changed": "Nothing in the repo; the timeline was not followed exactly",
+      "rejected": [],
+      "mistakes_caught": []
+    },
+    {
       "id": "S1",
       "tool": "Claude (web)",
       "model": "Claude Sonnet 5.5 (medium)",
